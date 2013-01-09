@@ -12,7 +12,7 @@ import pushnotify  # version >= 0.5
 def read_configuration():
     script_path = os.path.dirname(os.path.realpath(__file__))
     config = ConfigParser.RawConfigParser()
-    config.read(os.path.join(script_path, 'cluster-notify.conf'))
+    config.read(os.path.join(script_path, 'grid-notify.conf'))
     api = config.get('api', 'type')
     api_key = config.get('api', 'key')
     return (api, api_key)
