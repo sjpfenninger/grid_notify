@@ -1,0 +1,3 @@
+[api]
+type = either prowl, nma or pushover
+key = a valid api key for your chosen api
