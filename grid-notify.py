@@ -5,6 +5,7 @@ import sys
 import subprocess
 import argparse
 import time
+import datetime
 import ConfigParser
 import pushnotify  # version >= 0.5
 
@@ -52,9 +53,29 @@ def setup_notifier(api, api_key):
     return push_client
 
 
-def notify(notifier, task_id):
-    current_time = time.strftime("%Y-%m-%d %H:%M", time.gmtime())
-    notifier.notify(description='Task {} done @ {}.'.format(task_id, current_time), event='Tasks complete.')
+def _pretty_time_difference(start, end):
+    elapsed = end - start
+    secs = datetime.timedelta(seconds=elapsed)
+    d = datetime.datetime(1, 1, 1) + secs
+    elapsed_string = '{:02d}'.format(d.minute)
+    elapsed_format = 'mins'
+    if d.hour > 0:
+        elapsed_string = '{:02d}:'.format(d.hour) + elapsed_string
+        elapsed_format = 'hrs:mins'
+    if d.day > 1:
+        elapsed_string = '{:02d}:'.format(d.day - 1) + elapsed_string
+        elapsed_format = 'days:hrs:mins'
+    return elapsed_string + ' ' + elapsed_format
+
+
+def notify(notifier, task_id, start=None):
+    """If start given, assume it is a UNIX timestamp and also print time difference between start and current time"""
+    current_time = time.strftime("%Y-%m-%d %H:%M")
+    descr = 'Task {} done @ {}.'.format(task_id, current_time)
+    if start:
+        elapsed = _pretty_time_difference(start, time.time())
+        descr += ' Duration: {}.'.format(elapsed)
+    notifier.notify(description=descr, event='Tasks complete.')
 
 
 def monitor(task_id, user=None):
@@ -105,6 +126,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--process', dest='process', action='store_const', const=True, default=False, help='Do post-processing by calling process_{script}.')
     args = parser.parse_args()
     script_path = make_path_absolute(args.script)
+    start_time = time.time()
     task_id = run_and_get_task(script_path)
     daemonify()  # Push the script into the background so control is returned to terminal
     notifier = setup_notifier(_api, _api_key)
@@ -113,5 +135,5 @@ if __name__ == '__main__':
     if args.process:
         postprocess(script_path)
         task_id = str(task_id) + ' & post-processing'
-    notify(notifier, task_id)
+    notify(notifier, task_id, start=start_time)
     subprocess.call(["echo", "-e", "\a"])  # Terminal bell
