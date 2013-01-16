@@ -1,3 +1,7 @@
+[general]
+# Change title to set a different title for your notifications
+title = Cluster notification
+
 [api]
 type = either prowl, nma or pushover
 key = a valid api key for your chosen api

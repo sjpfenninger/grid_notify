@@ -14,9 +14,14 @@ def read_configuration():
     script_path = os.path.dirname(os.path.realpath(__file__))
     config = ConfigParser.RawConfigParser()
     config.read(os.path.join(script_path, 'grid-notify.conf'))
-    api = config.get('api', 'type')
-    api_key = config.get('api', 'key')
-    return (api, api_key)
+    configdict = {}
+    if config.has_option('general', 'title'):
+        configdict['title'] = config.get('general', 'title')
+    else:
+        configdict['title'] = 'Grid engine notification'
+    configdict['api'] = config.get('api', 'type')
+    configdict['api_key'] = config.get('api', 'key')
+    return configdict
 
 
 def parse_return(string):
@@ -47,8 +52,8 @@ def run_and_get_task(script, print_output=True):
     return task_id
 
 
-def setup_notifier(api, api_key):
-    push_client = pushnotify.get_client(api, application='ChemEng Cluster')
+def setup_notifier(api, api_key, title):
+    push_client = pushnotify.get_client(api, application=title)
     push_client.add_key(api_key)
     return push_client
 
@@ -120,7 +125,7 @@ def postprocess(script):
 
 
 if __name__ == '__main__':
-    _api, _api_key = read_configuration()
+    config = read_configuration()
     parser = argparse.ArgumentParser(description=os.path.basename(__file__))
     parser.add_argument('script', metavar='script', type=str, help='Grid Engine submission script to monitor.')
     parser.add_argument('-p', '--process', dest='process', action='store_const', const=True, default=False, help='Do post-processing by calling process_{script}.')
@@ -129,7 +134,7 @@ if __name__ == '__main__':
     start_time = time.time()
     task_id = run_and_get_task(script_path)
     daemonify()  # Push the script into the background so control is returned to terminal
-    notifier = setup_notifier(_api, _api_key)
+    notifier = setup_notifier(api=config['api'], api_key=config['api_key'], title=config['title'])
     user = os.environ['LOGNAME']
     monitor(task_id, user)  # This will return only once the tasks are complete
     if args.process:

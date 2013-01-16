@@ -13,8 +13,9 @@ Requirements:
 
 A `grid-notify.conf` file must exist in the same directory as the script itself. Copy `grid-notify.conf.example` to `grid-notify.conf` and fill in your settings:
 
-* `type`: Either `growl`, `nma`, or `pushover` (see [pushnotify documentation](http://packages.python.org/pushnotify/) for details).
-* `key`: A valid API key for your chosen API.
+* `[general] title`: Customize this to change the title used for push notifications.
+* `[api] type`: Either `growl`, `nma`, or `pushover` (see [pushnotify documentation](http://packages.python.org/pushnotify/) for details).
+* `[api] key`: A valid API key for your chosen API.
 
 ## Credits ##
 
