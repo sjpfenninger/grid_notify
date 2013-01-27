@@ -14,7 +14,7 @@ def read_configuration():
     """Read the configuration file and return a dict containing the settings"""
     script_path = os.path.dirname(os.path.realpath(__file__))
     config = ConfigParser.RawConfigParser()
-    config.read(os.path.join(script_path, 'grid-notify.conf'))
+    config.read(os.path.join(script_path, 'grid_notify.conf'))
     configdict = {}
     if config.has_option('general', 'title'):
         configdict['title'] = config.get('general', 'title')
