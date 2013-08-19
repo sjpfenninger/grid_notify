@@ -105,12 +105,12 @@ def notify(notifier, name, start=None):
 
     """
     current_time = time.strftime("%Y-%m-%d %H:%M")
-    descr = '{} done @ {}.'.format(name, current_time)
+    descr = 'Time: {}.'.format(name, current_time)
     if start:
         elapsed = _pretty_time_difference(start, time.time())
         descr += ' Duration: {}.'.format(elapsed)
     notifier.notify(description=descr,
-                    event='{} completed.'.format(name))
+                    event='{} completed'.format(name))
 
 
 def monitor(task_ids, user=None):
