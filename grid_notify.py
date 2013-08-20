@@ -105,12 +105,12 @@ def notify(notifier, name, start=None):
 
     """
     current_time = time.strftime("%Y-%m-%d %H:%M")
-    descr = 'Time: {}.'.format(name, current_time)
+    descr = 'Time: {}.'.format(current_time)
     if start:
         elapsed = _pretty_time_difference(start, time.time())
         descr += ' Duration: {}.'.format(elapsed)
     notifier.notify(description=descr,
-                    event='{} completed'.format(name))
+                    event='{} completed!'.format(name))
 
 
 def monitor(task_ids, user=None):
@@ -127,16 +127,16 @@ def monitor(task_ids, user=None):
         command = ['qstat']
     else:
         command = ['qstat', '-u', user]
-    task_id = task_ids.pop(0)  # Take the first task
+    task_id = task_ids.pop()  # Take the first (actually, last) task
     while True:
-        time.sleep(30)
         p = subprocess.Popen(command, stdout=subprocess.PIPE)
         tasks = [s for s in p.stdout if (str(task_id) in s)]
         if tasks:
+            time.sleep(30)
             continue
         else:
             try:
-                task_id = task_ids.pop(0)  # Take the next task
+                task_id = task_ids.pop()  # Take the next task
                 continue
             # If no more tasks are around, we get an exception and so
             # return True
